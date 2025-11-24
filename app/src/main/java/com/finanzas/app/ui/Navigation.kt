@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.finanzas.app.data.ThemePreferences
 import com.finanzas.app.data.repository.TransactionRepository
 import com.finanzas.app.ui.screens.*
 import com.finanzas.app.ui.theme.Primary
@@ -86,7 +87,8 @@ val bottomNavItems = listOf(
 
 @Composable
 fun MainNavigation(
-    repository: TransactionRepository
+    repository: TransactionRepository,
+    themePreferences: ThemePreferences
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -172,7 +174,7 @@ fun MainNavigation(
                 enterTransition = { fadeIn(animationSpec = tween(300)) },
                 exitTransition = { fadeOut(animationSpec = tween(300)) }
             ) {
-                SettingsScreen()
+                SettingsScreen(themePreferences = themePreferences)
             }
             
             composable(

@@ -4,11 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.finanzas.app.data.ThemeMode
 import com.finanzas.app.ui.MainNavigation
 import com.finanzas.app.ui.theme.FinanzasTheme
 
@@ -22,17 +26,29 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge
         enableEdgeToEdge()
         
-        // Get repository from application
+        // Get repository and preferences from application
         val app = application as FinanzasApplication
         val repository = app.transactionRepository
+        val themePreferences = app.themePreferences
         
         setContent {
-            FinanzasTheme {
+            val themeMode by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            
+            val darkTheme = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            
+            FinanzasTheme(darkTheme = darkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigation(repository = repository)
+                    MainNavigation(
+                        repository = repository,
+                        themePreferences = themePreferences
+                    )
                 }
             }
         }

@@ -18,15 +18,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.finanzas.app.data.ThemeMode
+import com.finanzas.app.data.ThemePreferences
 import com.finanzas.app.ui.theme.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
-    var darkModeEnabled by remember { mutableStateOf(false) }
+fun SettingsScreen(
+    themePreferences: ThemePreferences
+) {
+    val scope = rememberCoroutineScope()
+    val currentTheme by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+    
     var notificationsEnabled by remember { mutableStateOf(true) }
     var selectedCurrency by remember { mutableStateOf("ARS") }
     var showCurrencyDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -62,13 +70,16 @@ fun SettingsScreen() {
             
             item {
                 SettingsCard {
-                    SettingsItemWithSwitch(
+                    SettingsItemClickable(
                         icon = Icons.Outlined.DarkMode,
                         iconBgColor = AccentPurple,
-                        title = "Modo Oscuro",
-                        subtitle = "Activa el tema oscuro",
-                        isChecked = darkModeEnabled,
-                        onCheckedChange = { darkModeEnabled = it }
+                        title = "Tema",
+                        subtitle = when (currentTheme) {
+                            ThemeMode.LIGHT -> "Claro"
+                            ThemeMode.DARK -> "Oscuro"
+                            ThemeMode.SYSTEM -> "Sistema"
+                        },
+                        onClick = { showThemeDialog = true }
                     )
                     
                     HorizontalDivider(
@@ -259,6 +270,57 @@ fun SettingsScreen() {
             },
             confirmButton = {
                 TextButton(onClick = { showCurrencyDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Theme Dialog
+    if (showThemeDialog) {
+        AlertDialog(
+            onDismissRequest = { showThemeDialog = false },
+            title = { Text("Seleccionar Tema") },
+            text = {
+                Column {
+                    listOf(
+                        ThemeMode.LIGHT to "Claro",
+                        ThemeMode.DARK to "Oscuro",
+                        ThemeMode.SYSTEM to "Sistema"
+                    ).forEach { (mode, name) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    scope.launch {
+                                        themePreferences.setThemeMode(mode)
+                                    }
+                                    showThemeDialog = false
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = currentTheme == mode,
+                                onClick = {
+                                    scope.launch {
+                                        themePreferences.setThemeMode(mode)
+                                    }
+                                    showThemeDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showThemeDialog = false }) {
                     Text("Cancelar")
                 }
             }
