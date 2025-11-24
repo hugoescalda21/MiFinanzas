@@ -72,6 +72,15 @@ interface TransactionDao {
     fun getMonthExpenseByCategory(category: Category, yearMonth: String): Flow<Double>
     
     @Query("""
+        SELECT COALESCE(SUM(amount), 0) 
+        FROM transactions 
+        WHERE type = 'INCOME' 
+        AND category = :category
+        AND strftime('%Y-%m', date) = :yearMonth
+    """)
+    fun getMonthIncomeByCategory(category: Category, yearMonth: String): Flow<Double>
+    
+    @Query("""
         SELECT * FROM transactions 
         ORDER BY date DESC 
         LIMIT :limit

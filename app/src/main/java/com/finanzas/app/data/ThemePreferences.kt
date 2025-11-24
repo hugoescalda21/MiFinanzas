@@ -3,6 +3,7 @@ package com.finanzas.app.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -36,6 +37,7 @@ class ThemePreferences(private val context: Context) {
     companion object {
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
+        private val NOTIFICATIONS_KEY = booleanPreferencesKey("notifications_enabled")
     }
     
     val themeMode: Flow<ThemeMode> = context.dataStore.data.map { preferences ->
@@ -56,6 +58,10 @@ class ThemePreferences(private val context: Context) {
         }
     }
     
+    val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[NOTIFICATIONS_KEY] ?: true
+    }
+    
     suspend fun setThemeMode(mode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = mode.name
@@ -65,6 +71,12 @@ class ThemePreferences(private val context: Context) {
     suspend fun setCurrency(currency: Currency) {
         context.dataStore.edit { preferences ->
             preferences[CURRENCY_KEY] = currency.name
+        }
+    }
+    
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[NOTIFICATIONS_KEY] = enabled
         }
     }
 }

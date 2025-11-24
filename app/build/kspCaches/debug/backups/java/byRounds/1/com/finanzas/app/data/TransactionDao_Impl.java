@@ -1023,6 +1023,52 @@ public final class TransactionDao_Impl implements TransactionDao {
   }
 
   @Override
+  public Flow<Double> getMonthIncomeByCategory(final Category category, final String yearMonth) {
+    final String _sql = "\n"
+            + "        SELECT COALESCE(SUM(amount), 0) \n"
+            + "        FROM transactions \n"
+            + "        WHERE type = 'INCOME' \n"
+            + "        AND category = ?\n"
+            + "        AND strftime('%Y-%m', date) = ?\n"
+            + "    ";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    final String _tmp = __converters.fromCategory(category);
+    if (_tmp == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindString(_argIndex, _tmp);
+    }
+    _argIndex = 2;
+    _statement.bindString(_argIndex, yearMonth);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"transactions"}, new Callable<Double>() {
+      @Override
+      @NonNull
+      public Double call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final Double _result;
+          if (_cursor.moveToFirst()) {
+            final double _tmp_1;
+            _tmp_1 = _cursor.getDouble(0);
+            _result = _tmp_1;
+          } else {
+            _result = 0.0;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
   public Flow<List<Transaction>> getRecentTransactions(final int limit) {
     final String _sql = "\n"
             + "        SELECT * FROM transactions \n"

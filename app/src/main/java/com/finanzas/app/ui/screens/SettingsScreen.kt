@@ -41,13 +41,17 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val currentTheme by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val currentCurrency by themePreferences.currency.collectAsState(initial = Currency.ARS)
+    val notificationsEnabled by themePreferences.notificationsEnabled.collectAsState(initial = true)
     
-    var notificationsEnabled by remember { mutableStateOf(true) }
     var showCurrencyDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     var showExportDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var showImportResultDialog by remember { mutableStateOf(false) }
+    var importResult by remember { mutableStateOf<com.finanzas.app.utils.ImportUtils.ImportResult?>(null) }
     var isExporting by remember { mutableStateOf(false) }
+    var isImporting by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -123,7 +127,11 @@ fun SettingsScreen(
                         title = "Notificaciones",
                         subtitle = "Recibe alertas y recordatorios",
                         isChecked = notificationsEnabled,
-                        onCheckedChange = { notificationsEnabled = it }
+                        onCheckedChange = { 
+                            scope.launch {
+                                themePreferences.setNotificationsEnabled(it)
+                            }
+                        }
                     )
                     
                     HorizontalDivider(
@@ -154,6 +162,19 @@ fun SettingsScreen(
                         title = "Exportar Datos",
                         subtitle = "Exportar a archivo CSV",
                         onClick = { showExportDialog = true }
+                    )
+                    
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 68.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    )
+                    
+                    SettingsItemClickable(
+                        icon = Icons.Outlined.Download,
+                        iconBgColor = AccentCyan,
+                        title = "Importar Datos",
+                        subtitle = "Importar desde archivo CSV",
+                        onClick = { showImportDialog = true }
                     )
                     
                     HorizontalDivider(
@@ -418,6 +439,169 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Import Dialog
+    if (showImportDialog) {
+        var csvText by remember { mutableStateOf(com.finanzas.app.utils.ImportUtils.generateExampleCSV()) }
+        
+        AlertDialog(
+            onDismissRequest = { showImportDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.Download,
+                    contentDescription = null,
+                    tint = AccentCyan
+                )
+            },
+            title = { Text("Importar Datos", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(
+                        text = "Pega o escribe el contenido CSV a continuación:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    OutlinedTextField(
+                        value = csvText,
+                        onValueChange = { csvText = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        placeholder = { Text("Fecha,Tipo,Categoría,Descripción,Monto,...") },
+                        textStyle = MaterialTheme.typography.bodySmall
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "Formato: Fecha,Tipo,Categoría,Descripción,Monto,Nota,Recurrente,Periodo",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isImporting = true
+                        scope.launch {
+                            try {
+                                val result = com.finanzas.app.utils.ImportUtils.parseCSV(csvText)
+                                
+                                // Insert successful transactions into database
+                                result.transactions.forEach { transaction ->
+                                    transactionRepository.insertTransaction(transaction)
+                                }
+                                
+                                importResult = result
+                                showImportDialog = false
+                                showImportResultDialog = true
+                                
+                                if (result.successCount > 0) {
+                                    Toast.makeText(
+                                        context,
+                                        "${result.successCount} transacciones importadas",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "Error al importar: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } finally {
+                                isImporting = false
+                            }
+                        }
+                    },
+                    enabled = !isImporting && csvText.isNotBlank()
+                ) {
+                    if (isImporting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Importar")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Import Result Dialog
+    if (showImportResultDialog && importResult != null) {
+        AlertDialog(
+            onDismissRequest = { showImportResultDialog = false },
+            icon = {
+                Icon(
+                    imageVector = if (importResult!!.errorCount == 0) Icons.Filled.CheckCircle else Icons.Filled.Warning,
+                    contentDescription = null,
+                    tint = if (importResult!!.errorCount == 0) IncomeColor else WarningColor
+                )
+            },
+            title = { Text("Resultado de Importación", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(
+                        text = "✅ Importadas: ${importResult!!.successCount}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = IncomeColor
+                    )
+                    
+                    if (importResult!!.errorCount > 0) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "❌ Errores: ${importResult!!.errorCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = ExpenseColor
+                        )
+                        
+                        if (importResult!!.errors.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Primeros errores:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            importResult!!.errors.take(3).forEach { error ->
+                                Text(
+                                    text = "• $error",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (importResult!!.errors.size > 3) {
+                                Text(
+                                    text = "... y ${importResult!!.errors.size - 3} más",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { 
+                    showImportResultDialog = false
+                    importResult = null
+                }) {
+                    Text("Aceptar")
                 }
             }
         )

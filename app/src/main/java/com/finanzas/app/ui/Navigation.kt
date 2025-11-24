@@ -84,6 +84,13 @@ sealed class Screen(
         selectedIcon = Icons.Filled.AccountBalanceWallet,
         unselectedIcon = Icons.Outlined.AccountBalanceWallet
     )
+    
+    object Trends : Screen(
+        route = "trends",
+        title = "Tendencias",
+        selectedIcon = Icons.Filled.ShowChart,
+        unselectedIcon = Icons.Outlined.ShowChart
+    )
 }
 
 val bottomNavItems = listOf(
@@ -181,7 +188,12 @@ fun MainNavigation(
                 val viewModel: StatsViewModel = viewModel(
                     factory = StatsViewModelFactory(repository)
                 )
-                StatsScreen(viewModel = viewModel)
+                StatsScreen(
+                    viewModel = viewModel,
+                    onNavigateToTrends = {
+                        navController.navigate(Screen.Trends.route)
+                    }
+                )
             }
             
             composable(
@@ -254,6 +266,30 @@ fun MainNavigation(
                     factory = BudgetViewModelFactory(budgetRepository, repository)
                 )
                 BudgetScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+            
+            composable(
+                route = Screen.Trends.route,
+                enterTransition = { 
+                    slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(300)
+                    )
+                },
+                exitTransition = { 
+                    slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) {
+                val viewModel: TrendsViewModel = viewModel(
+                    factory = TrendsViewModelFactory(repository)
+                )
+                TrendsScreen(
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )

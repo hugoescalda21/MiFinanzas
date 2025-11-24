@@ -100,7 +100,8 @@ class StatsViewModelFactory(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
-    viewModel: StatsViewModel
+    viewModel: StatsViewModel,
+    onNavigateToTrends: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
@@ -112,6 +113,14 @@ fun StatsScreen(
                         text = "Estadísticas",
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToTrends) {
+                        Icon(
+                            imageVector = Icons.Outlined.ShowChart,
+                            contentDescription = "Ver tendencias"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background

@@ -44,6 +44,9 @@ class TransactionRepository(private val transactionDao: TransactionDao) {
     fun getMonthExpenseByCategory(category: Category, yearMonth: YearMonth): Flow<Double> =
         transactionDao.getMonthExpenseByCategory(category, yearMonth.format(yearMonthFormatter))
     
+    fun getMonthIncomeByCategory(category: Category, yearMonth: YearMonth): Flow<Double> =
+        transactionDao.getMonthIncomeByCategory(category, yearMonth.format(yearMonthFormatter))
+    
     fun getExpensesByCategory(yearMonth: YearMonth): Flow<List<CategorySum>> =
         transactionDao.getExpensesByCategory(yearMonth.format(yearMonthFormatter))
     
