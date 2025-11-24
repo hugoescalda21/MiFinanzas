@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.finanzas.app-mergeDebugResources-60:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\hugod\\.gradle\\caches\\transforms-4\\dcf9d4bc1647cbdc45bff45962465e4f\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

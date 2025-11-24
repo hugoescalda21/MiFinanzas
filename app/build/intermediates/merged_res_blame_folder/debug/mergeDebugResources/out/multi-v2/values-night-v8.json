@@ -1,0 +1,45 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.finanzas.app-mergeDebugResources-60:/values-night-v8/values-night-v8.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\hugod\\.gradle\\caches\\transforms-4\\2eccdc8a66dfb6f958b82559d78de7f7\\transformed\\core-splashscreen-1.0.1\\res\\values-night-v8\\values-night-v8.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "85",
+                        "endOffsets": "136"
+                    },
+                    "to": {
+                        "startLines": "16",
+                        "startColumns": "4",
+                        "startOffsets": "732",
+                        "endColumns": "85",
+                        "endOffsets": "813"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\hugod\\Claude\\FinanzasApp\\app\\src\\main\\res\\values-night\\themes.xml",
+                    "from": {
+                        "startLines": "11,17,19,18,14,22,24,15,16,21,23,12,13,20,3",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "468,751,837,793,605,979,1088,653,698,927,1034,513,555,882,56",
+                        "endLines": "11,17,19,18,14,22,24,15,16,21,23,12,13,20,8",
+                        "endColumns": "44,41,44,43,47,54,56,44,52,51,53,41,49,44,12",
+                        "endOffsets": "508,788,877,832,648,1029,1140,693,746,974,1083,550,600,922,422"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,17",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,100,142,187,231,279,334,391,436,489,541,595,637,687,818",
+                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,22",
+                        "endColumns": "44,41,44,43,47,54,56,44,52,51,53,41,49,44,12",
+                        "endOffsets": "95,137,182,226,274,329,386,431,484,536,590,632,682,727,1184"
+                    }
+                }
+            ]
+        }
+    ]
+}

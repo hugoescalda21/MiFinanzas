@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Wallet body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,38h48c3.3,0 6,2.7 6,6v28c0,3.3 -2.7,6 -6,6H30c-3.3,0 -6,-2.7 -6,-6V44C24,40.7 26.7,38 30,38z"/>
+    
+    <!-- Wallet flap shadow -->
+    <path
+        android:fillColor="#059669"
+        android:pathData="M24,44c0,-3.3 2.7,-6 6,-6h40l-6,10H24V44z"/>
+    
+    <!-- Card slot -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M66,54h10v10h-10z"
+        android:strokeWidth="0"/>
+    
+    <!-- Decorative circle -->
+    <path
+        android:fillColor="#10B981"
+        android:fillAlpha="0.3"
+        android:pathData="M71,59m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+    
+    <!-- Coin -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M42,60m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"/>
+    
+    <!-- Dollar sign on coin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,56v8M40,57.5h4M40,62.5h4"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"/>
+    
+    <!-- Subtle shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.2"
+        android:pathData="M30,38h20l-8,10H24V44C24,40.7 26.7,38 30,38z"/>
+</vector>
