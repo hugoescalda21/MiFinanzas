@@ -1,5 +1,6 @@
 package com.finanzas.app.utils
 
+import com.finanzas.app.data.Currency
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -8,9 +9,27 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-private val currencyFormatter = NumberFormat.getCurrencyInstance(Locale("es", "AR")).apply {
-    maximumFractionDigits = 2
-    minimumFractionDigits = 0
+private var currentCurrency: Currency = Currency.ARS
+
+fun setCurrency(currency: Currency) {
+    currentCurrency = currency
+}
+
+fun getCurrency(): Currency = currentCurrency
+
+private fun getCurrencyFormatter(): NumberFormat {
+    val locale = when (currentCurrency) {
+        Currency.ARS -> Locale("es", "AR")
+        Currency.USD -> Locale("en", "US")
+        Currency.EUR -> Locale("es", "ES")
+        Currency.MXN -> Locale("es", "MX")
+        Currency.CLP -> Locale("es", "CL")
+        Currency.COP -> Locale("es", "CO")
+    }
+    return NumberFormat.getCurrencyInstance(locale).apply {
+        maximumFractionDigits = if (currentCurrency == Currency.CLP) 0 else 2
+        minimumFractionDigits = 0
+    }
 }
 
 private val dateFormatter = DateTimeFormatter.ofPattern("d 'de' MMMM", Locale("es", "ES"))
@@ -19,7 +38,7 @@ private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val monthYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale("es", "ES"))
 
 fun formatCurrency(amount: Double): String {
-    return currencyFormatter.format(amount)
+    return getCurrencyFormatter().format(amount)
 }
 
 fun formatDate(date: LocalDateTime): String {

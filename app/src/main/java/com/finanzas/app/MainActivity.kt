@@ -8,13 +8,16 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.finanzas.app.data.Currency
 import com.finanzas.app.data.ThemeMode
 import com.finanzas.app.ui.MainNavigation
 import com.finanzas.app.ui.theme.FinanzasTheme
+import com.finanzas.app.utils.setCurrency
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +36,12 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val themeMode by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val currency by themePreferences.currency.collectAsState(initial = Currency.ARS)
+            
+            // Apply currency change
+            LaunchedEffect(currency) {
+                setCurrency(currency)
+            }
             
             val darkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
@@ -47,7 +56,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainNavigation(
                         repository = repository,
-                        themePreferences = themePreferences
+                        themePreferences = themePreferences,
+                        currentCurrency = currency
                     )
                 }
             }

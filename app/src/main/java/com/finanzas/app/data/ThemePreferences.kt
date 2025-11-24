@@ -17,10 +17,25 @@ enum class ThemeMode {
     SYSTEM
 }
 
+enum class Currency(
+    val code: String,
+    val displayName: String,
+    val symbol: String,
+    val locale: String
+) {
+    ARS("ARS", "Peso Argentino", "$", "es_AR"),
+    USD("USD", "Dólar Estadounidense", "$", "en_US"),
+    EUR("EUR", "Euro", "€", "es_ES"),
+    MXN("MXN", "Peso Mexicano", "$", "es_MX"),
+    CLP("CLP", "Peso Chileno", "$", "es_CL"),
+    COP("COP", "Peso Colombiano", "$", "es_CO")
+}
+
 class ThemePreferences(private val context: Context) {
     
     companion object {
         private val THEME_KEY = stringPreferencesKey("theme_mode")
+        private val CURRENCY_KEY = stringPreferencesKey("currency")
     }
     
     val themeMode: Flow<ThemeMode> = context.dataStore.data.map { preferences ->
@@ -32,9 +47,24 @@ class ThemePreferences(private val context: Context) {
         }
     }
     
+    val currency: Flow<Currency> = context.dataStore.data.map { preferences ->
+        val currencyName = preferences[CURRENCY_KEY] ?: Currency.ARS.name
+        try {
+            Currency.valueOf(currencyName)
+        } catch (e: IllegalArgumentException) {
+            Currency.ARS
+        }
+    }
+    
     suspend fun setThemeMode(mode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = mode.name
+        }
+    }
+    
+    suspend fun setCurrency(currency: Currency) {
+        context.dataStore.edit { preferences ->
+            preferences[CURRENCY_KEY] = currency.name
         }
     }
 }

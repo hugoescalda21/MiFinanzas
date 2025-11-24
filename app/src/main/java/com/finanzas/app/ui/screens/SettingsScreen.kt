@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.finanzas.app.data.Currency
 import com.finanzas.app.data.ThemeMode
 import com.finanzas.app.data.ThemePreferences
 import com.finanzas.app.ui.theme.*
@@ -30,9 +31,9 @@ fun SettingsScreen(
 ) {
     val scope = rememberCoroutineScope()
     val currentTheme by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+    val currentCurrency by themePreferences.currency.collectAsState(initial = Currency.ARS)
     
     var notificationsEnabled by remember { mutableStateOf(true) }
-    var selectedCurrency by remember { mutableStateOf("ARS") }
     var showCurrencyDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     
@@ -91,7 +92,7 @@ fun SettingsScreen(
                         icon = Icons.Outlined.Payments,
                         iconBgColor = IncomeColor,
                         title = "Moneda",
-                        subtitle = selectedCurrency,
+                        subtitle = "${currentCurrency.code} - ${currentCurrency.displayName}",
                         onClick = { showCurrencyDialog = true }
                     )
                 }
@@ -226,40 +227,37 @@ fun SettingsScreen(
             title = { Text("Seleccionar Moneda") },
             text = {
                 Column {
-                    listOf(
-                        "ARS" to "Peso Argentino",
-                        "USD" to "Dólar Estadounidense",
-                        "EUR" to "Euro",
-                        "MXN" to "Peso Mexicano",
-                        "CLP" to "Peso Chileno",
-                        "COP" to "Peso Colombiano"
-                    ).forEach { (code, name) ->
+                    Currency.entries.forEach { currency ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    selectedCurrency = code
+                                    scope.launch {
+                                        themePreferences.setCurrency(currency)
+                                    }
                                     showCurrencyDialog = false
                                 }
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = selectedCurrency == code,
+                                selected = currentCurrency == currency,
                                 onClick = {
-                                    selectedCurrency = code
+                                    scope.launch {
+                                        themePreferences.setCurrency(currency)
+                                    }
                                     showCurrencyDialog = false
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Column {
                                 Text(
-                                    text = code,
+                                    text = "${currency.symbol} ${currency.code}",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = name,
+                                    text = currency.displayName,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

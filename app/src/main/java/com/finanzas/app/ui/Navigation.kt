@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.finanzas.app.data.Currency
 import com.finanzas.app.data.ThemePreferences
 import com.finanzas.app.data.repository.TransactionRepository
 import com.finanzas.app.ui.screens.*
@@ -88,7 +89,8 @@ val bottomNavItems = listOf(
 @Composable
 fun MainNavigation(
     repository: TransactionRepository,
-    themePreferences: ThemePreferences
+    themePreferences: ThemePreferences,
+    currentCurrency: Currency
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
