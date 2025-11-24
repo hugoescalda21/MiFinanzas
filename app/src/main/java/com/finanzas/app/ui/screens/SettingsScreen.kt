@@ -52,6 +52,7 @@ fun SettingsScreen(
     var importResult by remember { mutableStateOf<com.finanzas.app.utils.ImportUtils.ImportResult?>(null) }
     var isExporting by remember { mutableStateOf(false) }
     var isImporting by remember { mutableStateOf(false) }
+    var showEditProfileDialog by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -77,7 +78,10 @@ fun SettingsScreen(
         ) {
             // Profile Section
             item {
-                ProfileSection()
+                ProfileSection(
+                    themePreferences = themePreferences,
+                    onEditProfile = { showEditProfileDialog = true }
+                )
             }
             
             // Preferences Section
@@ -606,15 +610,74 @@ fun SettingsScreen(
             }
         )
     }
+    
+    // Edit Profile Dialog
+    if (showEditProfileDialog) {
+        val currentName by themePreferences.userName.collectAsState(initial = "Usuario")
+        var newName by remember { mutableStateOf(currentName) }
+        
+        AlertDialog(
+            onDismissRequest = { showEditProfileDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text("Editar Perfil", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(
+                        text = "Nombre de usuario",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        placeholder = { Text("Tu nombre") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            if (newName.isNotBlank()) {
+                                themePreferences.setUserName(newName.trim())
+                            }
+                            showEditProfileDialog = false
+                        }
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditProfileDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-private fun ProfileSection() {
+private fun ProfileSection(
+    themePreferences: ThemePreferences,
+    onEditProfile: () -> Unit
+) {
+    val userName by themePreferences.userName.collectAsState(initial = "Usuario")
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp)
+            .clickable(onClick = onEditProfile),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -637,11 +700,11 @@ private fun ProfileSection() {
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                Text(
+                    text = userName.take(1).uppercase(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
             
@@ -649,12 +712,12 @@ private fun ProfileSection() {
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Usuario",
+                    text = userName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Gestiona tu perfil",
+                    text = "Toca para editar perfil",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

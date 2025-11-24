@@ -23,6 +23,7 @@ data class AddTransactionUiState(
     val note: String = "",
     val isRecurring: Boolean = false,
     val recurringPeriod: RecurringPeriod? = null,
+    val accountId: Long = 1, // Default to Personal account
     val isEditing: Boolean = false,
     val transactionId: Long? = null,
     val isLoading: Boolean = false,
@@ -51,6 +52,7 @@ class AddTransactionViewModel(
                     note = transaction.note,
                     isRecurring = transaction.isRecurring,
                     recurringPeriod = transaction.recurringPeriod,
+                    accountId = transaction.accountId,
                     isEditing = true,
                     transactionId = transaction.id,
                     isLoading = false
@@ -163,7 +165,8 @@ class AddTransactionViewModel(
                     date = state.date,
                     note = state.note.trim(),
                     isRecurring = state.isRecurring,
-                    recurringPeriod = if (state.isRecurring) state.recurringPeriod else null
+                    recurringPeriod = if (state.isRecurring) state.recurringPeriod else null,
+                    accountId = state.accountId
                 )
                 
                 if (state.isEditing && state.transactionId != null) {

@@ -57,7 +57,7 @@ public final class TransactionDao_Impl implements TransactionDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `transactions` (`id`,`amount`,`description`,`category`,`type`,`date`,`note`,`isRecurring`,`recurringPeriod`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `transactions` (`id`,`amount`,`description`,`category`,`type`,`date`,`note`,`isRecurring`,`recurringPeriod`,`accountId`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -93,6 +93,7 @@ public final class TransactionDao_Impl implements TransactionDao {
         } else {
           statement.bindString(9, _tmp_4);
         }
+        statement.bindLong(10, entity.getAccountId());
       }
     };
     this.__deletionAdapterOfTransaction = new EntityDeletionOrUpdateAdapter<Transaction>(__db) {
@@ -112,7 +113,7 @@ public final class TransactionDao_Impl implements TransactionDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `transactions` SET `id` = ?,`amount` = ?,`description` = ?,`category` = ?,`type` = ?,`date` = ?,`note` = ?,`isRecurring` = ?,`recurringPeriod` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `transactions` SET `id` = ?,`amount` = ?,`description` = ?,`category` = ?,`type` = ?,`date` = ?,`note` = ?,`isRecurring` = ?,`recurringPeriod` = ?,`accountId` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -148,7 +149,8 @@ public final class TransactionDao_Impl implements TransactionDao {
         } else {
           statement.bindString(9, _tmp_4);
         }
-        statement.bindLong(10, entity.getId());
+        statement.bindLong(10, entity.getAccountId());
+        statement.bindLong(11, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteTransactionById = new SharedSQLiteStatement(__db) {
@@ -262,6 +264,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -324,7 +327,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -363,6 +368,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final Transaction _result;
           if (_cursor.moveToFirst()) {
             final long _tmpId;
@@ -424,7 +430,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _result = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _result = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
           } else {
             _result = null;
           }
@@ -460,6 +468,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -522,7 +531,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -563,6 +574,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -625,7 +637,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -671,6 +685,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -733,7 +748,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_8 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_8);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -779,6 +796,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -841,7 +859,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_8 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_8);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -1093,6 +1113,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -1155,7 +1176,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;
@@ -1247,6 +1270,7 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
           final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
           final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final int _cursorIndexOfAccountId = CursorUtil.getColumnIndexOrThrow(_cursor, "accountId");
           final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Transaction _item;
@@ -1309,7 +1333,9 @@ public final class TransactionDao_Impl implements TransactionDao {
               _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
             }
             _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
-            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            final long _tmpAccountId;
+            _tmpAccountId = _cursor.getLong(_cursorIndexOfAccountId);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod,_tmpAccountId);
             _result.add(_item);
           }
           return _result;

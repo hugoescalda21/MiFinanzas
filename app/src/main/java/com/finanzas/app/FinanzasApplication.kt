@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.work.*
 import com.finanzas.app.data.FinanzasDatabase
 import com.finanzas.app.data.ThemePreferences
+import com.finanzas.app.data.repository.AccountRepository
 import com.finanzas.app.data.repository.BudgetRepository
 import com.finanzas.app.data.repository.TransactionRepository
 import com.finanzas.app.workers.RecurringTransactionWorker
@@ -19,6 +20,10 @@ class FinanzasApplication : Application() {
     
     val budgetRepository: BudgetRepository by lazy {
         BudgetRepository(database.budgetDao(), database.transactionDao())
+    }
+    
+    val accountRepository: AccountRepository by lazy {
+        AccountRepository(database.accountDao())
     }
     
     val themePreferences: ThemePreferences by lazy {

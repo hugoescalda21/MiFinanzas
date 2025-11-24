@@ -38,6 +38,7 @@ class ThemePreferences(private val context: Context) {
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
         private val NOTIFICATIONS_KEY = booleanPreferencesKey("notifications_enabled")
+        private val USER_NAME_KEY = stringPreferencesKey("user_name")
     }
     
     val themeMode: Flow<ThemeMode> = context.dataStore.data.map { preferences ->
@@ -62,6 +63,10 @@ class ThemePreferences(private val context: Context) {
         preferences[NOTIFICATIONS_KEY] ?: true
     }
     
+    val userName: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[USER_NAME_KEY] ?: "Usuario"
+    }
+    
     suspend fun setThemeMode(mode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = mode.name
@@ -77,6 +82,12 @@ class ThemePreferences(private val context: Context) {
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[NOTIFICATIONS_KEY] = enabled
+        }
+    }
+    
+    suspend fun setUserName(name: String) {
+        context.dataStore.edit { preferences ->
+            preferences[USER_NAME_KEY] = name
         }
     }
 }

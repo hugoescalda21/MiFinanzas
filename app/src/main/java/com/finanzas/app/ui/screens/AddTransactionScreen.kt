@@ -399,6 +399,8 @@ private fun AmountInputSection(
     onAmountChange: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit
 ) {
+    var showCalculator by remember { mutableStateOf(false) }
+    
     val backgroundColor = if (type == TransactionType.EXPENSE) 
         ExpenseBgLight else IncomeBgLight
     val accentColor = if (type == TransactionType.EXPENSE) 
@@ -474,9 +476,30 @@ private fun AmountInputSection(
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
                     cursorColor = accentColor
-                )
+                ),
+                trailingIcon = {
+                    IconButton(onClick = { showCalculator = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Calculate,
+                            contentDescription = "Calculadora",
+                            tint = accentColor
+                        )
+                    }
+                }
             )
         }
+    }
+    
+    // Calculator Dialog
+    if (showCalculator) {
+        com.finanzas.app.ui.components.CalculatorDialog(
+            initialValue = amount,
+            onDismiss = { showCalculator = false },
+            onConfirm = { value ->
+                onAmountChange(value.toString())
+                showCalculator = false
+            }
+        )
     }
 }
 

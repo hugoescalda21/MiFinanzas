@@ -15,7 +15,8 @@ data class Transaction(
     val date: LocalDateTime = LocalDateTime.now(),
     val note: String = "",
     val isRecurring: Boolean = false,
-    val recurringPeriod: RecurringPeriod? = null
+    val recurringPeriod: RecurringPeriod? = null,
+    val accountId: Long = 1 // Default to Personal account
 )
 
 enum class TransactionType {
