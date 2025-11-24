@@ -27,8 +27,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.finanzas.app.data.Currency
 import com.finanzas.app.data.ThemePreferences
+import com.finanzas.app.data.repository.BudgetRepository
 import com.finanzas.app.data.repository.TransactionRepository
 import com.finanzas.app.ui.screens.*
 import com.finanzas.app.ui.theme.Primary
@@ -77,6 +77,13 @@ sealed class Screen(
             return "add_transaction?isExpense=$isExpense&transactionId=${transactionId ?: -1}"
         }
     }
+    
+    object Budget : Screen(
+        route = "budget",
+        title = "Presupuestos",
+        selectedIcon = Icons.Filled.AccountBalanceWallet,
+        unselectedIcon = Icons.Outlined.AccountBalanceWallet
+    )
 }
 
 val bottomNavItems = listOf(
@@ -89,8 +96,8 @@ val bottomNavItems = listOf(
 @Composable
 fun MainNavigation(
     repository: TransactionRepository,
-    themePreferences: ThemePreferences,
-    currentCurrency: Currency
+    budgetRepository: BudgetRepository,
+    themePreferences: ThemePreferences
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -137,6 +144,12 @@ fun MainNavigation(
                     },
                     onTransactionClick = { transactionId ->
                         navController.navigate(Screen.AddTransaction.createRoute(transactionId = transactionId))
+                    },
+                    onNavigateToBudget = {
+                        navController.navigate(Screen.Budget.route)
+                    },
+                    onNavigateToStats = {
+                        navController.navigate(Screen.Stats.route)
                     }
                 )
             }
@@ -176,7 +189,10 @@ fun MainNavigation(
                 enterTransition = { fadeIn(animationSpec = tween(300)) },
                 exitTransition = { fadeOut(animationSpec = tween(300)) }
             ) {
-                SettingsScreen(themePreferences = themePreferences)
+                SettingsScreen(
+                    themePreferences = themePreferences,
+                    transactionRepository = repository
+                )
             }
             
             composable(
@@ -215,6 +231,30 @@ fun MainNavigation(
                     viewModel = viewModel,
                     transactionId = if (transactionId > 0) transactionId else null,
                     isExpense = isExpense,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+            
+            composable(
+                route = Screen.Budget.route,
+                enterTransition = { 
+                    slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(300)
+                    )
+                },
+                exitTransition = { 
+                    slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) {
+                val viewModel: BudgetViewModel = viewModel(
+                    factory = BudgetViewModelFactory(budgetRepository, repository)
+                )
+                BudgetScreen(
+                    viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

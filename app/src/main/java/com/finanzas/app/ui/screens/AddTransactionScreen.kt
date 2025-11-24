@@ -216,6 +216,85 @@ fun AddTransactionScreen(
                     }
                 )
                 
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // Recurring Section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Repeat,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Transacción Recurrente",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "Se repetirá automáticamente",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = uiState.isRecurring,
+                                onCheckedChange = { viewModel.updateIsRecurring(it) }
+                            )
+                        }
+                        
+                        AnimatedVisibility(visible = uiState.isRecurring) {
+                            Column {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                
+                                Text(
+                                    text = "Frecuencia",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(com.finanzas.app.data.model.RecurringPeriod.entries.toList()) { period ->
+                                        val isSelected = uiState.recurringPeriod == period
+                                        FilterChip(
+                                            selected = isSelected,
+                                            onClick = { viewModel.updateRecurringPeriod(period) },
+                                            label = {
+                                                Text(
+                                                    text = when (period) {
+                                                        com.finanzas.app.data.model.RecurringPeriod.DAILY -> "Diario"
+                                                        com.finanzas.app.data.model.RecurringPeriod.WEEKLY -> "Semanal"
+                                                        com.finanzas.app.data.model.RecurringPeriod.MONTHLY -> "Mensual"
+                                                        com.finanzas.app.data.model.RecurringPeriod.YEARLY -> "Anual"
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 // Save Button

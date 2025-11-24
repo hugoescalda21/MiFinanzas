@@ -1,5 +1,6 @@
 package com.finanzas.app.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,19 +17,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.finanzas.app.data.Currency
 import com.finanzas.app.data.ThemeMode
 import com.finanzas.app.data.ThemePreferences
+import com.finanzas.app.data.model.Transaction
+import com.finanzas.app.data.repository.TransactionRepository
 import com.finanzas.app.ui.theme.*
+import com.finanzas.app.utils.ExportUtils
+import com.finanzas.app.utils.formatCurrency
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    themePreferences: ThemePreferences
+    themePreferences: ThemePreferences,
+    transactionRepository: TransactionRepository
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val currentTheme by themePreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val currentCurrency by themePreferences.currency.collectAsState(initial = Currency.ARS)
@@ -36,6 +45,9 @@ fun SettingsScreen(
     var notificationsEnabled by remember { mutableStateOf(true) }
     var showCurrencyDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showExportDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var isExporting by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -140,21 +152,8 @@ fun SettingsScreen(
                         icon = Icons.Outlined.Upload,
                         iconBgColor = AccentPurple,
                         title = "Exportar Datos",
-                        subtitle = "Exportar a CSV o Excel",
-                        onClick = { /* TODO */ }
-                    )
-                    
-                    HorizontalDivider(
-                        modifier = Modifier.padding(start = 68.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                    )
-                    
-                    SettingsItemClickable(
-                        icon = Icons.Outlined.Download,
-                        iconBgColor = AccentCyan,
-                        title = "Importar Datos",
-                        subtitle = "Importar desde archivo",
-                        onClick = { /* TODO */ }
+                        subtitle = "Exportar a archivo CSV",
+                        onClick = { showExportDialog = true }
                     )
                     
                     HorizontalDivider(
@@ -167,7 +166,7 @@ fun SettingsScreen(
                         iconBgColor = ExpenseColor,
                         title = "Eliminar Todos los Datos",
                         subtitle = "Esta acción no se puede deshacer",
-                        onClick = { /* TODO */ },
+                        onClick = { showDeleteDialog = true },
                         titleColor = ExpenseColor
                     )
                 }
@@ -319,6 +318,105 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showThemeDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Export Dialog
+    if (showExportDialog) {
+        AlertDialog(
+            onDismissRequest = { showExportDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.Upload,
+                    contentDescription = null,
+                    tint = AccentPurple
+                )
+            },
+            title = { Text("Exportar Datos") },
+            text = { 
+                Text("Se exportarán todas tus transacciones a un archivo CSV que podrás guardar o compartir.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isExporting = true
+                        showExportDialog = false
+                        scope.launch {
+                            val transactions = transactionRepository.allTransactions.first()
+                            ExportUtils.exportToCsv(
+                                context = context,
+                                transactions = transactions,
+                                onSuccess = { uri ->
+                                    isExporting = false
+                                    ExportUtils.shareFile(context, uri, "MiFinanzas.csv")
+                                },
+                                onError = { error ->
+                                    isExporting = false
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        }
+                    },
+                    enabled = !isExporting
+                ) {
+                    if (isExporting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text("Exportar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExportDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Delete All Data Dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.DeleteForever,
+                    contentDescription = null,
+                    tint = ExpenseColor
+                )
+            },
+            title = { Text("Eliminar Todos los Datos") },
+            text = { 
+                Text("¿Estás seguro de que deseas eliminar todas las transacciones? Esta acción no se puede deshacer.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val transactions = transactionRepository.allTransactions.first()
+                            transactions.forEach { transaction ->
+                                transactionRepository.deleteTransaction(transaction)
+                            }
+                            showDeleteDialog = false
+                            Toast.makeText(context, "Datos eliminados", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ExpenseColor
+                    )
+                ) {
+                    Text("Eliminar Todo")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
                     Text("Cancelar")
                 }
             }

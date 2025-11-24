@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.finanzas.app-mergeDebugResources-60:/values-v30/values-v30.xml",
+            "outputFile": "com.finanzas.app-mergeDebugResources-65:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\hugod\\.gradle\\caches\\transforms-4\\dcf9d4bc1647cbdc45bff45962465e4f\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\hugod\\.gradle\\caches\\8.13\\transforms\\1b3b26a2a5584ced8bb151f3f9e21334\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

@@ -7,6 +7,10 @@
     <attr format="integer" name="windowSplashScreenAnimationDuration"/>
     <attr format="color" name="windowSplashScreenBackground"/>
     <attr format="color" name="windowSplashScreenIconBackgroundColor"/>
+    <bool name="enable_system_alarm_service_default">true</bool>
+    <bool name="enable_system_foreground_service_default">true</bool>
+    <bool name="enable_system_job_service_default">false</bool>
+    <bool name="workmanager_test_configuration">false</bool>
     <color name="accent_coral">#F97316</color>
     <color name="accent_cyan">#06B6D4</color>
     <color name="accent_pink">#EC4899</color>

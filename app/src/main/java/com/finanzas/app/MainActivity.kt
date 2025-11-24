@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
         // Get repository and preferences from application
         val app = application as FinanzasApplication
         val repository = app.transactionRepository
+        val budgetRepository = app.budgetRepository
         val themePreferences = app.themePreferences
         
         setContent {
@@ -56,8 +57,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainNavigation(
                         repository = repository,
-                        themePreferences = themePreferences,
-                        currentCurrency = currency
+                        budgetRepository = budgetRepository,
+                        themePreferences = themePreferences
                     )
                 }
             }

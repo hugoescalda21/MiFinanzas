@@ -29,7 +29,9 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToTransactions: () -> Unit,
     onNavigateToAddTransaction: (isExpense: Boolean) -> Unit,
-    onTransactionClick: (Long) -> Unit
+    onTransactionClick: (Long) -> Unit,
+    onNavigateToBudget: () -> Unit,
+    onNavigateToStats: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
@@ -112,17 +114,17 @@ fun HomeScreen(
                     )
                     
                     QuickActionButton(
-                        icon = Icons.Outlined.SwapHoriz,
-                        label = "Transferir",
+                        icon = Icons.Outlined.AccountBalanceWallet,
+                        label = "Presupuesto",
                         backgroundColor = AccentPurple,
-                        onClick = { /* TODO */ }
+                        onClick = onNavigateToBudget
                     )
                     
                     QuickActionButton(
                         icon = Icons.Outlined.BarChart,
                         label = "Estadísticas",
                         backgroundColor = AccentCyan,
-                        onClick = { /* TODO */ }
+                        onClick = onNavigateToStats
                     )
                 }
             }

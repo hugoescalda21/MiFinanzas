@@ -120,3 +120,4 @@ style Theme.FinanzasApp
 style Theme.FinanzasApp.Splash
 xml backup_rules
 xml data_extraction_rules
+xml file_paths

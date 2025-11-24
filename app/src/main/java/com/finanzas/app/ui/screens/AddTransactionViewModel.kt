@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.finanzas.app.data.model.Category
+import com.finanzas.app.data.model.RecurringPeriod
 import com.finanzas.app.data.model.Transaction
 import com.finanzas.app.data.model.TransactionType
 import com.finanzas.app.data.repository.TransactionRepository
@@ -20,6 +21,8 @@ data class AddTransactionUiState(
     val type: TransactionType = TransactionType.EXPENSE,
     val date: LocalDateTime = LocalDateTime.now(),
     val note: String = "",
+    val isRecurring: Boolean = false,
+    val recurringPeriod: RecurringPeriod? = null,
     val isEditing: Boolean = false,
     val transactionId: Long? = null,
     val isLoading: Boolean = false,
@@ -46,6 +49,8 @@ class AddTransactionViewModel(
                     type = transaction.type,
                     date = transaction.date,
                     note = transaction.note,
+                    isRecurring = transaction.isRecurring,
+                    recurringPeriod = transaction.recurringPeriod,
                     isEditing = true,
                     transactionId = transaction.id,
                     isLoading = false
@@ -113,6 +118,23 @@ class AddTransactionViewModel(
         _uiState.value = _uiState.value.copy(note = note)
     }
     
+    fun updateIsRecurring(isRecurring: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isRecurring = isRecurring,
+            recurringPeriod = if (isRecurring && _uiState.value.recurringPeriod == null) {
+                RecurringPeriod.MONTHLY
+            } else if (!isRecurring) {
+                null
+            } else {
+                _uiState.value.recurringPeriod
+            }
+        )
+    }
+    
+    fun updateRecurringPeriod(period: RecurringPeriod) {
+        _uiState.value = _uiState.value.copy(recurringPeriod = period)
+    }
+    
     fun saveTransaction() {
         val state = _uiState.value
         
@@ -139,7 +161,9 @@ class AddTransactionViewModel(
                     category = state.category,
                     type = state.type,
                     date = state.date,
-                    note = state.note.trim()
+                    note = state.note.trim(),
+                    isRecurring = state.isRecurring,
+                    recurringPeriod = if (state.isRecurring) state.recurringPeriod else null
                 )
                 
                 if (state.isEditing && state.transactionId != null) {

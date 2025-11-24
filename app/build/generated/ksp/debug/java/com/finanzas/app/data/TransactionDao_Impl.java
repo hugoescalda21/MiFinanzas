@@ -1180,6 +1180,101 @@ public final class TransactionDao_Impl implements TransactionDao {
     });
   }
 
+  @Override
+  public Object getRecurringTransactions(
+      final Continuation<? super List<Transaction>> $completion) {
+    final String _sql = "SELECT * FROM transactions WHERE isRecurring = 1 ORDER BY date DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<List<Transaction>>() {
+      @Override
+      @NonNull
+      public List<Transaction> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfAmount = CursorUtil.getColumnIndexOrThrow(_cursor, "amount");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
+          final int _cursorIndexOfDate = CursorUtil.getColumnIndexOrThrow(_cursor, "date");
+          final int _cursorIndexOfNote = CursorUtil.getColumnIndexOrThrow(_cursor, "note");
+          final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
+          final int _cursorIndexOfRecurringPeriod = CursorUtil.getColumnIndexOrThrow(_cursor, "recurringPeriod");
+          final List<Transaction> _result = new ArrayList<Transaction>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Transaction _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final double _tmpAmount;
+            _tmpAmount = _cursor.getDouble(_cursorIndexOfAmount);
+            final String _tmpDescription;
+            _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            final Category _tmpCategory;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final Category _tmp_1 = __converters.toCategory(_tmp);
+            if (_tmp_1 == null) {
+              throw new IllegalStateException("Expected NON-NULL 'com.finanzas.app.data.model.Category', but it was NULL.");
+            } else {
+              _tmpCategory = _tmp_1;
+            }
+            final TransactionType _tmpType;
+            final String _tmp_2;
+            if (_cursor.isNull(_cursorIndexOfType)) {
+              _tmp_2 = null;
+            } else {
+              _tmp_2 = _cursor.getString(_cursorIndexOfType);
+            }
+            final TransactionType _tmp_3 = __converters.toTransactionType(_tmp_2);
+            if (_tmp_3 == null) {
+              throw new IllegalStateException("Expected NON-NULL 'com.finanzas.app.data.model.TransactionType', but it was NULL.");
+            } else {
+              _tmpType = _tmp_3;
+            }
+            final LocalDateTime _tmpDate;
+            final String _tmp_4;
+            if (_cursor.isNull(_cursorIndexOfDate)) {
+              _tmp_4 = null;
+            } else {
+              _tmp_4 = _cursor.getString(_cursorIndexOfDate);
+            }
+            final LocalDateTime _tmp_5 = __converters.toLocalDateTime(_tmp_4);
+            if (_tmp_5 == null) {
+              throw new IllegalStateException("Expected NON-NULL 'java.time.LocalDateTime', but it was NULL.");
+            } else {
+              _tmpDate = _tmp_5;
+            }
+            final String _tmpNote;
+            _tmpNote = _cursor.getString(_cursorIndexOfNote);
+            final boolean _tmpIsRecurring;
+            final int _tmp_6;
+            _tmp_6 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_6 != 0;
+            final RecurringPeriod _tmpRecurringPeriod;
+            final String _tmp_7;
+            if (_cursor.isNull(_cursorIndexOfRecurringPeriod)) {
+              _tmp_7 = null;
+            } else {
+              _tmp_7 = _cursor.getString(_cursorIndexOfRecurringPeriod);
+            }
+            _tmpRecurringPeriod = __converters.toRecurringPeriod(_tmp_7);
+            _item = new Transaction(_tmpId,_tmpAmount,_tmpDescription,_tmpCategory,_tmpType,_tmpDate,_tmpNote,_tmpIsRecurring,_tmpRecurringPeriod);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
   @NonNull
   public static List<Class<?>> getRequiredConverters() {
     return Collections.emptyList();

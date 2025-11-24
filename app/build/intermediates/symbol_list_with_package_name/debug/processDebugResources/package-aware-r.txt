@@ -45,6 +45,10 @@ attr windowSplashScreenAnimatedIcon
 attr windowSplashScreenAnimationDuration
 attr windowSplashScreenBackground
 attr windowSplashScreenIconBackgroundColor
+bool enable_system_alarm_service_default
+bool enable_system_foreground_service_default
+bool enable_system_job_service_default
+bool workmanager_test_configuration
 color accent_coral
 color accent_cyan
 color accent_pink
@@ -449,3 +453,4 @@ styleable NavInclude graph
 styleable Navigator android_label android_id route
 xml backup_rules
 xml data_extraction_rules
+xml file_paths
